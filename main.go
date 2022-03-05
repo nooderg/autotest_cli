@@ -2,13 +2,31 @@ package main
 
 import (
 	"autotest-cli/authentication"
+	"fmt"
 	"log"
-	"net/http"
+	"os"
+
+	"github.com/urfave/cli"
 )
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/login", authentication.Login)
-	log.Println("Ecoute en http://127.0.0.1:8080")
-	http.ListenAndServe(":8080", mux)
+	app := cli.NewApp()
+
+	app.Commands = []cli.Command{
+		{
+			Name:    "login",
+			Aliases: []string{"a"},
+			Usage:   "Return token",
+			Action: func(c *cli.Context) error {
+				fmt.Println(authentication.Login(c.Args()[0], c.Args()[1]))
+
+				return nil
+			},
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
